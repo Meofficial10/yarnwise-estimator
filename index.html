@@ -180,6 +180,7 @@ function resultHTML(mid, lo, hi, basis, skeinYards, unitWord, extra) {
     '<details><summary>Why is this an estimate?</summary><p style="font-size:13px">It cannot reliably predict real yarn consumption for sure, because yarn density, stitch gauge, your tension, hook size, fiber, and pattern construction all change usage materially. ' + (basis === "verified" ? 'The swatch number is mathematically the same fabric scaled up — accuracy depends on how well your swatch represents the real piece and on your measurement precision.' : 'This uses published guide ranges and stitch-family factors that are approximations, not measurements; textured stitches (shell, bobble, granny) can use 20–50% more yarn than plain double crochet.') + ' Treat any number here as a buying guide with a buffer — the goal is to be transparent, not to pretend we can predict exactly.</p></details>';
 }
 function runSwatch() {
+  $("res1").style.display = "none";
   const sw = toIn(num("sw")), sh = toIn(num("sh"));
   const tw = toIn(num("tw")), th = toIn(num("th"));
   if (!sw || !sh || !tw || !th) { $("err1").textContent = "Please enter positive numbers for swatch and target size."; $("err1").style.display = "block"; return; }
@@ -200,6 +201,7 @@ function runSwatch() {
   t("result_view", { mode: "swatch", yards: Math.round(mid) });
 }
 function runQuick() {
+  $("res2").style.display = "none";
   const tpl = $("tpl").value;
   let w = NaN, h = NaN;
   if (tpl === "custom") { w = num("qw"); h = num("qh"); }
@@ -232,10 +234,11 @@ $("calcSwatch").onclick = runSwatch;
 $("calcQuick").onclick = runQuick;
 $("tpl").onchange = () => { const v = $("tpl").value; $("qw").value = v === "custom" ? "" : v.split("x")[0]; $("qh").value = v === "custom" ? "" : v.split("x")[1]; };
 $("unitToggle").onclick = () => {
-  unit = unit === "in" ? "cm" : "in";
-  $("unitLabel").textContent = unit === "in" ? "inches" : "cm";
-  $("unitToggle").textContent = unit === "in" ? "use cm" : "use inches";
-  const conv = unit === "in" ? 2.54 : 1 / 2.54;
+  const wasIn = unit === "in";
+  unit = wasIn ? "cm" : "in";
+  $("unitLabel").textContent = wasIn ? "cm" : "inches";
+  $("unitToggle").textContent = wasIn ? "use inches" : "use cm";
+  const conv = wasIn ? 2.54 : 1 / 2.54;
   ["sw", "sh", "tw", "th"].forEach((id) => { const el = $(id); if (el.value) el.value = (parseFloat(el.value) * conv).toFixed(2); });
 };
 document.addEventListener("click", (ev) => {
