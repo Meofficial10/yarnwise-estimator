@@ -188,7 +188,7 @@ function runSwatch() {
   if ($("ynByYard").checked) { yards = num("sy"); }
   else { const g = num("sg"), ypg = num("sypg"); if (g && ypg) yards = g * ypg / 100; else { $("err1").textContent = "Enter grams AND yards-per-100g (or switch to yards)."; $("err1").style.display = "block"; return; } }
   if (!(yards > 0)) { $("err1").textContent = "Enter yarn used in the swatch."; $("err1").style.display = "block"; return; }
-  const buf = (parseFloat($("buf1").value) || 10) / 100;
+  const buf = (isFinite(parseFloat($("buf1").value)) ? parseFloat($("buf1").value) : 10) / 100;
   const areaRatio = (tw * th) / (sw * sh);
   const mid = areaRatio * yards * (1 + buf);
   if (!isFinite(mid) || mid <= 0) { $("err1").textContent = "Result invalid — check your numbers."; $("err1").style.display = "block"; return; }
@@ -212,7 +212,7 @@ function runQuick() {
   const gauge = CYC_GAUGE4[cat];
   const spi = gauge / 4;
   const ypsf = ANCHOR_YPSF * (spi / ANCHOR_SPI) * (STITCH[st].f);
-  const buf = (parseFloat($("buf2").value) || 10) / 100;
+  const buf = (isFinite(parseFloat($("buf2").value)) ? parseFloat($("buf2").value) : 10) / 100;
   const areaF = (w * h) / 144;
   const mid = ypsf * areaF * (1 + buf);
   if (!isFinite(mid) || mid <= 0) { $("err2").textContent = "Result invalid — check your inputs."; $("err2").style.display = "block"; return; }
