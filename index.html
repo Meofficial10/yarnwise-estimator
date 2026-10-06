@@ -148,8 +148,19 @@
 <script>
 "use strict";
 /* telemetry: events stored locally; optional free endpoint set at deploy time only (leave empty now — no backend) */
-const TELEMETRY_ENDPOINT = "";
-const t = (e, d) => { try { const q = JSON.parse(localStorage.getItem("dsh_events") || "[]"); q.push({ e, d: d||{}, t: Date.now() }); localStorage.setItem("dsh_events", JSON.stringify(q.slice(-200))); } catch (err) {} if (TELEMETRY_ENDPOINT) { try { fetch(TELEMETRY_ENDPOINT + "?e=" + encodeURIComponent(e) + "&t=" + Date.now(), { mode: "no-cors" }); } catch (err) {} } };
+const TELEMETRY_ENDPOINT = "https://yw-measure.yarnwise.workers.dev";
+const t = (e, d) => { try { const q = JSON.parse(localStorage.getItem("dsh_events") || "[]"); q.push({ e, d: d||{}, t: Date.now() }); localStorage.setItem("dsh_events", JSON.stringify(q.slice(-200))); } catch (err) {} if (TELEMETRY_ENDPOINT) {
+      try {
+        const tsKey = "dsh_last_visit_sent";
+        if (e === "visit") {
+          const lst = parseInt(localStorage.getItem(tsKey) || "0", 10);
+          if (Date.now() - lst < 300000) return;
+        }
+        const q = TELEMETRY_ENDPOINT + "?e=" + encodeURIComponent(e) + (d && d.mode ? "&m=" + encodeURIComponent(d.mode) : "");
+        fetch(q, { mode: "no-cors" });
+        if (e === "visit") localStorage.setItem(tsKey, String(Date.now()));
+      } catch (err) {}
+    } };
 /* visit bookkeeping: visitors + repeat visits (best effort, per browser) */
 try {
   const fsKey = "dsh_first_seen";
